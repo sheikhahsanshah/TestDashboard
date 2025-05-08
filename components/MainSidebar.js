@@ -27,28 +27,16 @@ const MainSidebar = ({ activeView, onNavigate, isMainMenuOpen, onToggleMainMenu 
             className={`bg-gray-800 text-gray-300 flex flex-col h-screen fixed top-0 left-0 z-30 border-r border-gray-700 transition-all duration-300 ease-in-out ${isMainMenuOpen ? "w-60" : "w-20"}`}
         >
             <div
-                className={`h-[68px] w-full  flex items-center justify-between border-b border-gray-700 ${isMainMenuOpen ? "px-6 justify-start" : "justify-center"}`}
+                className={`h-[68px] w-full flex items-center justify-between border-b border-gray-700 ${isMainMenuOpen ? "px-6 justify-start" : "justify-center"}`}
             >
                 <span
                     className={`text-xl font-semibold text-white transition-opacity duration-200 whitespace-nowrap ${isMainMenuOpen ? "opacity-100 delay-200" : "opacity-0 absolute pointer-events-none"}`}
                 >
                     Acadèmia
                 </span>
-                <span
-                    className={`flex items-center justify-between text-xl pl-4 font-bold text-white transition-opacity duration-200 whitespace-nowrap ${!isMainMenuOpen ? "opacity-100" : "opacity-0 absolute pointer-events-none"}`}
-                >
-                    A
-                    <button
-                        onClick={onToggleMainMenu}
-                        className={`p-2 rounded-md text-gray-400 hover:bg-gray-700 hover:text-white transition-colors ${!isMainMenuOpen ? "opacity-0" : "opacity-100"}`}
-                        title={isMainMenuOpen ? "Contraure Menú" : "Expandir Menú"}
-                    >
-                        {isMainMenuOpen ? <ChevronsLeft size={18} /> : <ChevronsRight size={18} />}
-                    </button>
-                </span>
                 <button
                     onClick={onToggleMainMenu}
-                    className={`p-2 rounded-md text-gray-400 hover:bg-gray-700 hover:text-white transition-colors ${!isMainMenuOpen ? "opacity-0" : "opacity-100"}`}
+                    className="p-2 rounded-md text-gray-400 hover:bg-gray-700 hover:text-white transition-colors"
                     title={isMainMenuOpen ? "Contraure Menú" : "Expandir Menú"}
                 >
                     {isMainMenuOpen ? <ChevronsLeft size={18} /> : <ChevronsRight size={18} />}
@@ -76,7 +64,6 @@ const MainSidebar = ({ activeView, onNavigate, isMainMenuOpen, onToggleMainMenu 
                     </a>
                 ))}
             </nav>
-           
         </aside>
     )
 }
