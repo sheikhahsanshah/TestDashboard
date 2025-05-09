@@ -130,6 +130,30 @@ const initialStudents = [
             },
         ],
         titularId: "tit1",
+        // Additional fields for Avaluació tab
+        academyReports: [
+            { id: "ar1", fileName: "Informe_1T_Mates_24-25.pdf", date: "2025-03-15", url: "#" },
+            { id: "ar2", fileName: "Informe_Global_ESO_24-25.pdf", date: "2025-03-20", url: "#" },
+        ],
+        academyExams: [
+            { id: "ae1", subject: "Matemàtiques", date: "2025-02-28", grade: 7.5 },
+            { id: "ae2", subject: "Física", date: "2025-03-10", grade: 6.8 },
+            { id: "ae3", subject: "Matemàtiques", date: "2025-04-07", grade: 8.2 },
+        ],
+        schoolReports: [
+            { id: "sr1", fileName: "Notes_1a_Avaluacio_IFMQ.pdf", date: "2024-12-20", url: "#" },
+            { id: "sr2", fileName: "Notes_2a_Avaluacio_IFMQ.pdf", date: "2025-03-25", url: "#" },
+        ],
+        schoolExams: [
+            { id: "se1", subject: "Física i Química", date: "2025-04-10", grade: 6.0 },
+            { id: "se2", subject: "Tecnologia", date: "2025-04-18", grade: 7.0 },
+            { id: "se3", subject: "Matemàtiques", date: "2025-04-22", grade: 5.5 },
+        ],
+        // Additional fields for Dades tab
+        address: "C/ Major, 15",
+        city: "Tarragona",
+        postalCode: "43001",
+        notes: "Alumne molt aplicat però amb tendència a distreure's. Necessita reforç en matemàtiques.",
     },
     {
         id: 2,
@@ -209,6 +233,19 @@ const initialStudents = [
         commercialOpportunities: [],
         commercialContacts: [],
         titularId: "tit2",
+        // Additional fields for Avaluació tab
+        academyReports: [{ id: "ar3", fileName: "Informe_1T_Angles_24-25.pdf", date: "2025-03-10", url: "#" }],
+        academyExams: [
+            { id: "ae4", subject: "Anglès", date: "2025-03-05", grade: 6.5 },
+            { id: "ae5", subject: "Català", date: "2025-03-15", grade: 7.2 },
+        ],
+        schoolReports: [{ id: "sr3", fileName: "Notes_1a_Avaluacio_CSP.pdf", date: "2024-12-15", url: "#" }],
+        schoolExams: [{ id: "se4", subject: "Anglès", date: "2025-04-05", grade: 5.8 }],
+        // Additional fields for Dades tab
+        address: "Av. Catalunya, 28",
+        city: "Tarragona",
+        postalCode: "43002",
+        notes: "Necessita reforç en totes les assignatures. Bona actitud però li costa concentrar-se.",
     },
     {
         id: 3,
@@ -264,6 +301,16 @@ const initialStudents = [
         commercialOpportunities: [],
         commercialContacts: [],
         titularId: "tit3",
+        // Additional fields for Avaluació tab
+        academyReports: [],
+        academyExams: [{ id: "ae6", subject: "Matemàtiques", date: "2025-04-01", grade: 6.0 }],
+        schoolReports: [],
+        schoolExams: [{ id: "se5", subject: "Matemàtiques", date: "2025-04-15", grade: 4.5 }],
+        // Additional fields for Dades tab
+        address: "C/ Riu Segre, 5",
+        city: "Tarragona",
+        postalCode: "43006",
+        notes: "Dificultats amb les matemàtiques. Necessita reforç específic en àlgebra.",
     },
 ]
 
@@ -309,7 +356,7 @@ const sampleTitulars = [
 
 // --- Component Principal App ---
 function App() {
-    const [activeView, setActiveView] = useState("professors") // Default to Professors view now
+    const [activeView, setActiveView] = useState("horaris") // Default to horaris view
     const [selectedSessionId, setSelectedSessionId] = useState(null)
     const [selectedStudent, setSelectedStudent] = useState(null)
     const [selectedAulaForTracking, setSelectedAulaForTracking] = useState(5)
@@ -479,7 +526,7 @@ function App() {
                     />
                 )
             default:
-                return <ProfessorsView />
+                return <CalendarView onNavigateToTracking={navigateToTracking} />
         }
     }
 

@@ -27,12 +27,17 @@ const MainSidebar = ({ activeView, onNavigate, isMainMenuOpen, onToggleMainMenu 
             className={`bg-gray-800 text-gray-300 flex flex-col h-screen fixed top-0 left-0 z-30 border-r border-gray-700 transition-all duration-300 ease-in-out ${isMainMenuOpen ? "w-60" : "w-20"}`}
         >
             <div
-                className={`h-[68px] w-full flex items-center justify-between border-b border-gray-700 ${isMainMenuOpen ? "px-6 justify-start" : "justify-center"}`}
+                className={`h-[68px] flex items-center justify-between border-b border-gray-700 ${isMainMenuOpen ? "px-6" : "px-2"}`}
             >
                 <span
                     className={`text-xl font-semibold text-white transition-opacity duration-200 whitespace-nowrap ${isMainMenuOpen ? "opacity-100 delay-200" : "opacity-0 absolute pointer-events-none"}`}
                 >
                     Acadèmia
+                </span>
+                <span
+                    className={`text-xl font-bold text-white transition-opacity duration-200 whitespace-nowrap ${!isMainMenuOpen ? "opacity-100" : "opacity-0 absolute pointer-events-none"}`}
+                >
+                    A
                 </span>
                 <button
                     onClick={onToggleMainMenu}
