@@ -100,6 +100,8 @@ const ProfessorsView = () => {
     const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7)) // format YYYY-MM
     const [isAvailabilityModalOpen, setIsAvailabilityModalOpen] = useState(false)
     const [editingAvailabilityProfessor, setEditingAvailabilityProfessor] = useState(null)
+    const [sortColumn, setSortColumn] = useState(null)
+    const [sortDirection, setSortDirection] = useState("asc")
 
     // State for filters
     const [filterService, setFilterService] = useState([])
@@ -189,6 +191,41 @@ const ProfessorsView = () => {
         setEditingAvailabilityProfessor(null)
     }
 
+    const handleSort = (column) => {
+        if (sortColumn === column) {
+            setSortDirection(sortDirection === "asc" ? "desc" : "asc")
+        } else {
+            setSortColumn(column)
+            setSortDirection("asc")
+        }
+    }
+
+    const getSortedTeachers = (teachers) => {
+        if (!sortColumn) return teachers
+
+        return [...teachers].sort((a, b) => {
+            let aValue = a[sortColumn]
+            let bValue = b[sortColumn]
+
+            if (sortColumn === "hoursThisMonth") {
+                aValue = Number(aValue) || 0
+                bValue = Number(bValue) || 0
+            } else if (typeof aValue === "string") {
+                aValue = aValue.toLowerCase()
+                bValue = bValue.toLowerCase()
+            }
+
+            if (aValue < bValue) return sortDirection === "asc" ? -1 : 1
+            if (aValue > bValue) return sortDirection === "asc" ? 1 : -1
+            return 0
+        })
+    }
+
+    const SortIcon = ({ column }) => {
+        if (sortColumn !== column) return <span className="text-gray-500 ml-1">↕</span>
+        return <span className="text-blue-400 ml-1">{sortDirection === "asc" ? "↑" : "↓"}</span>
+    }
+
     // --- Availability Summary Component ---
     const AvailabilitySummary = ({ availability }) => {
         const days = ["Dll", "Dm", "Dc", "Dj", "Dv", "Ds", "Dg"]
@@ -264,27 +301,31 @@ const ProfessorsView = () => {
                         <tr>
                             <th
                                 scope="col"
-                                className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider"
+                                className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-600"
+                                onClick={() => handleSort("name")}
                             >
-                                Nom
+                                Nom <SortIcon column="name" />
                             </th>
                             <th
                                 scope="col"
-                                className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider"
+                                className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-600"
+                                onClick={() => handleSort("status")}
                             >
-                                Estat
+                                Estat <SortIcon column="status" />
                             </th>
                             <th
                                 scope="col"
-                                className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider"
+                                className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-600"
+                                onClick={() => handleSort("email")}
                             >
-                                Correu Electrònic
+                                Correu Electrònic <SortIcon column="email" />
                             </th>
                             <th
                                 scope="col"
-                                className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider"
+                                className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-600"
+                                onClick={() => handleSort("services")}
                             >
-                                Serveis
+                                Serveis <SortIcon column="services" />
                             </th>
                             <th
                                 scope="col"
@@ -294,9 +335,10 @@ const ProfessorsView = () => {
                             </th>
                             <th
                                 scope="col"
-                                className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider"
+                                className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-600"
+                                onClick={() => handleSort("hoursThisMonth")}
                             >
-                                Hores Mes
+                                Hores Mes <SortIcon column="hoursThisMonth" />
                             </th>
                             <th scope="col" className="relative px-6 py-3">
                                 <span className="sr-only">Accions</span>
@@ -304,7 +346,7 @@ const ProfessorsView = () => {
                         </tr>
                     </thead>
                     <tbody className="bg-gray-800 divide-y divide-gray-700">
-                        {filteredTeachers.map((teacher) => (
+                        {getSortedTeachers(filteredTeachers).map((teacher) => (
                             <tr key={teacher.id} className="hover:bg-gray-700/50">
                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100">{teacher.name}</td>
                                 <td className="px-6 py-4 whitespace-nowrap">
@@ -360,7 +402,7 @@ const ProfessorsView = () => {
                                 </td>
                             </tr>
                         ))}
-                        {filteredTeachers.length === 0 && (
+                        {getSortedTeachers(filteredTeachers).length === 0 && (
                             <tr>
                                 <td colSpan="7" className="text-center py-10 text-gray-500 italic">
                                     No hi ha professors que coincideixin amb els filtres.

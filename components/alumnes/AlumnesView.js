@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Filter, Plus } from 'lucide-react'
+import { Filter, Plus } from "lucide-react"
 import FilterModal from "../shared/FilterModal"
 import AddNewStudentModal from "./AddNewStudentModal"
 
@@ -309,7 +309,7 @@ const allStudentsList = [
         school: "Institut Pons d'Icart",
         email: "aina.sole@email.com",
         imageAuth: true,
-        emergencyName: "David Solé",
+        emergencyName: "David Sol��",
         emergencyRelation: "Pare",
         emergencyPhone: "601555666",
         objective: "Selectivitat Història",
@@ -410,18 +410,75 @@ const AlumnesView = ({ navigateToStudentDetail }) => {
     const [selectedDocents, setSelectedDocents] = useState([])
     const [selectedCursos, setSelectedCursos] = useState([])
 
+    // Sorting state
+    const [sortColumn, setSortColumn] = useState(null)
+    const [sortDirection, setSortDirection] = useState("asc")
+
     const filteredStudentList = allStudentsList // Placeholder
+
+    // Sorting functions
+    const handleSort = (column) => {
+        if (sortColumn === column) {
+            setSortDirection(sortDirection === "asc" ? "desc" : "asc")
+        } else {
+            setSortColumn(column)
+            setSortDirection("asc")
+        }
+    }
+
+    const getSortedStudents = (students) => {
+        if (!sortColumn) return students
+
+        return [...students].sort((a, b) => {
+            let aValue, bValue
+
+            switch (sortColumn) {
+                case "name":
+                    aValue = a.name?.toLowerCase() || ""
+                    bValue = b.name?.toLowerCase() || ""
+                    break
+                case "courses":
+                    aValue = a.courses?.length || 0
+                    bValue = b.courses?.length || 0
+                    break
+                case "lastContact":
+                    aValue = a.lastContact ? new Date(a.lastContact) : new Date(0)
+                    bValue = b.lastContact ? new Date(b.lastContact) : new Date(0)
+                    break
+                case "firstEnrollment":
+                    aValue = a.firstEnrollment ? new Date(a.firstEnrollment) : new Date(0)
+                    bValue = b.firstEnrollment ? new Date(b.firstEnrollment) : new Date(0)
+                    break
+                default:
+                    return 0
+            }
+
+            if (aValue < bValue) return sortDirection === "asc" ? -1 : 1
+            if (aValue > bValue) return sortDirection === "asc" ? 1 : -1
+            return 0
+        })
+    }
+
+    const getSortIcon = (column) => {
+        if (sortColumn !== column) {
+            return <span className="text-gray-500 ml-1">↕</span>
+        }
+        return <span className="text-blue-400 ml-1">{sortDirection === "asc" ? "↑" : "↓"}</span>
+    }
+
+    const sortedStudentList = getSortedStudents(filteredStudentList)
 
     const handleSelectAll = (event) => {
         const isChecked = event.target.checked
         setSelectAll(isChecked)
         if (isChecked) {
-            const allIds = new Set(filteredStudentList.map((s) => s.id))
+            const allIds = new Set(sortedStudentList.map((s) => s.id))
             setSelectedStudents(allIds)
         } else {
             setSelectedStudents(new Set())
         }
     }
+
     const handleSelectStudent = (studentId) => {
         setSelectedStudents((prevSelected) => {
             const newSelected = new Set(prevSelected)
@@ -430,10 +487,11 @@ const AlumnesView = ({ navigateToStudentDetail }) => {
             } else {
                 newSelected.add(studentId)
             }
-            setSelectAll(newSelected.size === filteredStudentList.length && filteredStudentList.length > 0)
+            setSelectAll(newSelected.size === sortedStudentList.length && sortedStudentList.length > 0)
             return newSelected
         })
     }
+
     const handleCreateNewStudent = (newStudentData) => {
         console.log("Creating new student:", newStudentData)
         setIsAddNewStudentModalOpen(false)
@@ -472,7 +530,7 @@ const AlumnesView = ({ navigateToStudentDetail }) => {
         <div className="flex flex-col h-full">
             <div className="flex-1 overflow-x-auto p-4">
                 <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-semibold text-white">Llista d'Alumnes ({filteredStudentList.length})</h2>
+                    <h2 className="text-xl font-semibold text-white">Llista d'Alumnes ({sortedStudentList.length})</h2>
                     <div className="flex space-x-2">
                         <button
                             onClick={() => setIsFiltersModalOpen(true)}
@@ -491,55 +549,65 @@ const AlumnesView = ({ navigateToStudentDetail }) => {
                 <div className="bg-gray-800 shadow-md rounded-lg overflow-hidden">
                     <table className="min-w-full divide-y divide-gray-700">
                         <thead className="bg-gray-700">
-                            {" "}
                             <tr>
-                                {" "}
                                 <th scope="col" className="p-4">
-                                    {" "}
                                     <input
                                         type="checkbox"
                                         className="form-checkbox h-4 w-4 text-blue-500 bg-gray-600 border-gray-500 rounded focus:ring-blue-500"
                                         checked={selectAll}
                                         onChange={handleSelectAll}
-                                    />{" "}
-                                </th>{" "}
+                                    />
+                                </th>
                                 <th
                                     scope="col"
-                                    className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider"
+                                    className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-600 transition-colors"
+                                    onClick={() => handleSort("name")}
                                 >
-                                    Nom
-                                </th>{" "}
+                                    <div className="flex items-center">
+                                        Nom
+                                        {getSortIcon("name")}
+                                    </div>
+                                </th>
                                 <th
                                     scope="col"
-                                    className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider"
+                                    className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-600 transition-colors"
+                                    onClick={() => handleSort("courses")}
                                 >
-                                    Cursos
-                                </th>{" "}
+                                    <div className="flex items-center">
+                                        Cursos
+                                        {getSortIcon("courses")}
+                                    </div>
+                                </th>
                                 <th
                                     scope="col"
-                                    className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider"
+                                    className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-600 transition-colors"
+                                    onClick={() => handleSort("lastContact")}
                                 >
-                                    Últim Contacte
-                                </th>{" "}
+                                    <div className="flex items-center">
+                                        Últim Contacte
+                                        {getSortIcon("lastContact")}
+                                    </div>
+                                </th>
                                 <th
                                     scope="col"
-                                    className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider"
+                                    className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-600 transition-colors"
+                                    onClick={() => handleSort("firstEnrollment")}
                                 >
-                                    Primera Alta
-                                </th>{" "}
-                            </tr>{" "}
+                                    <div className="flex items-center">
+                                        Primera Alta
+                                        {getSortIcon("firstEnrollment")}
+                                    </div>
+                                </th>
+                            </tr>
                         </thead>
                         <tbody className="bg-gray-800 divide-y divide-gray-700">
-                            {filteredStudentList.map((student) => (
+                            {sortedStudentList.map((student) => (
                                 <tr
                                     key={student.id}
                                     className="hover:bg-gray-700/50 cursor-pointer"
                                     onClick={() => navigateToStudentDetail(student.id)}
                                 >
-                                    {" "}
-                                    {/* Make row clickable */}
                                     <td className="p-4">
-                                        {" "}
                                         <input
                                             type="checkbox"
                                             className="form-checkbox h-4 w-4 text-blue-500 bg-gray-600 border-gray-500 rounded focus:ring-blue-500"
@@ -548,15 +616,11 @@ const AlumnesView = ({ navigateToStudentDetail }) => {
                                                 e.stopPropagation()
                                                 handleSelectStudent(student.id)
                                             }}
-                                        />{" "}
-                                    </td>{" "}
-                                    {/* Stop propagation on checkbox click */}
+                                        />
+                                    </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
-                                        {" "}
                                         <div className="flex items-center">
-                                            {" "}
                                             <div className="flex-shrink-0 h-10 w-10">
-                                                {" "}
                                                 <img
                                                     className="h-10 w-10 rounded-full border border-gray-600"
                                                     src={student.avatarUrl || "/placeholder.svg"}
@@ -565,27 +629,23 @@ const AlumnesView = ({ navigateToStudentDetail }) => {
                                                         e.target.src = `https://placehold.co/40x40/4B5563/9CA3AF?text=Err`
                                                     }}
                                                 />
-                                            </div>{" "}
+                                            </div>
                                             <div className="ml-4">
-                                                {" "}
-                                                <div className="text-sm font-medium text-gray-100">{student.name}</div>{" "}
-                                            </div>{" "}
-                                        </div>{" "}
+                                                <div className="text-sm font-medium text-gray-100">{student.name}</div>
+                                            </div>
+                                        </div>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
-                                        {" "}
                                         <div className="flex flex-wrap gap-1 max-w-xs">
-                                            {" "}
                                             {student.courses?.map((course) => (
                                                 <span
                                                     key={course}
                                                     className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getCourseChipColor(course)}`}
                                                 >
-                                                    {" "}
-                                                    {course}{" "}
+                                                    {course}
                                                 </span>
-                                            ))}{" "}
-                                        </div>{" "}
+                                            ))}
+                                        </div>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">{student.lastContact || "-"}</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
@@ -593,12 +653,11 @@ const AlumnesView = ({ navigateToStudentDetail }) => {
                                     </td>
                                 </tr>
                             ))}
-                            {filteredStudentList.length === 0 && (
+                            {sortedStudentList.length === 0 && (
                                 <tr>
-                                    {" "}
                                     <td colSpan="5" className="text-center py-10 text-gray-500 italic">
                                         No s'han trobat alumnes amb els filtres seleccionats.
-                                    </td>{" "}
+                                    </td>
                                 </tr>
                             )}
                         </tbody>
